@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -110,9 +111,15 @@ func validateID(c *gin.Context, paramName string) (int, bool) {
 func (p *ProxyServer) setupRoutes() *gin.Engine {
 	r := gin.Default()
 
+	// Get allowed origin from environment variable
+	allowedOrigin := os.Getenv("ORIGIN")
+	if allowedOrigin == "" {
+		allowedOrigin = "*" // fallback
+	}
+
 	// Add CORS middleware
 	r.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", allowedOrigin)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
